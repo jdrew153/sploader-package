@@ -9,14 +9,7 @@ declare const useKaykatJDUploader: () => {
 };
 
 
-export default useKaykatJDUploader;
 
-
-export interface TSploaderPackage {
-    useKaykatJDUploader: () => void;
+declare module "sploader-package" {
+    export default useKaykatJDUploader;
 }
-
-declare const sploaderPackage: TSploaderPackage;
-
-export default sploaderPackage;
-
