@@ -1,5 +1,3 @@
 
 
-declare module '../src' {
-  export * from '../src'
-}
+export * from './hooks'
