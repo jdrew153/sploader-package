@@ -42,7 +42,7 @@ const useKaykatJDUploader = (): HookReturnType => {
                 if (!data) {
                     throw new Error('Something went wrong while uploading your file.. ')
                 }
-                return data
+                setFileUrl(data)
             })
     }
 
