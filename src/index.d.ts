@@ -11,4 +11,12 @@ declare const useKaykatJDUploader: () => {
 
 export default useKaykatJDUploader;
 
-export declare module "index"
+
+export interface TSploaderPackage {
+    useKaykatJDUploader: () => void;
+}
+
+declare const sploaderPackage: TSploaderPackage;
+
+export default sploaderPackage;
+
