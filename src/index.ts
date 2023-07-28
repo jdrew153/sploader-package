@@ -10,49 +10,49 @@ export interface HookReturnType {
 }
 
 
-const useKaykatJDUploader = (): HookReturnType => {
+const useKaykatJDUploader = () => {
+
     const [progress, setProgress] = useState(0);
     const [fileUrl, setFileUrl] = useState<string |null>(null );
     const [isLoading, setIsLoading] = useState(false);
 
-    const mutateAsync = async (data: TSploaderUploadHookRequest) => {
-        const blobType = data.blob as any
-        if (!(blobType instanceof Blob) || !data.blob) {
-            throw new Error('Blob must be set to make the request')
-        }
 
-        if (!process.env.SPLOADER_API_KEY) {
-            throw new Error('API Key must be set to make the request')
-        }
-
-        axiosChunker({
-            blob: data.blob,
-            fileType: data.fileType,
-            apiKey: process.env.SPLOADER_API_KEY,
-            fileId: data.uploadId,
-            callback: (progress: number) => {
-                setProgress(progress * 100)
-            }
-        })
-            .catch((error) => {
-                throw new Error(error)
+    const { mutateAsync} = useMutation({
+        mutationFn: async (data:TSploaderUploadHookRequest) => {
+            return await axiosChunker({
+                blob: data.blob,
+                fileId: data.uploadId,
+                fileType: data.fileType,
+                callback: (progress: number) =>  {
+                    setProgress(progress)
+                },
+                apiKey: process.env.SPLOADER_API_KEY || ''
             })
-            .then((data) => {
+        },
+        onMutate: () => {
+            setIsLoading(true)
+        },
+        onError: (error) => {
+            setIsLoading(false)
+            setProgress(0)
+        },
+        onSuccess: (data: string) => {
+            setIsLoading(false)
+            setFileUrl(data)
 
-                if (!data) {
-                    throw new Error('Something went wrong while uploading your file.. ')
-                }
-                setFileUrl(data)
-            })
-    }
+
+            setProgress(0)
+        }
+    });
+
 
     return {
         progress,
         fileUrl,
         isLoading,
-        uploadFile: mutateAsync,
+        uploadFile: mutateAsync
     }
-}
+};
 
 export default useKaykatJDUploader;
 
@@ -93,6 +93,7 @@ export type TSploaderUploadHookRequest = z.infer<typeof SploaderUploadHookReques
 
 
 import axios, {AxiosRequestConfig} from "axios";
+import {useMutation} from "react-query";
 
 export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } : TFileUploadChunkRequest) => {
 
