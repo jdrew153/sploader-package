@@ -26,7 +26,7 @@ const useKaykatJDUploader = () => {
             fileType: data.fileType,
             apiKey: env.SPLOADER_API_KEY,
             fileId: data.uploadId,
-            callback: (progress) => {
+            callback: (progress: number) => {
                 setProgress(progress * 100)
             }
         })
@@ -60,6 +60,4 @@ const useKaykatJDUploader = () => {
         uploadFile: mutateAsync
     }
 };
-
-export default useKaykatJDUploader;
 
