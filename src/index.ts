@@ -38,6 +38,13 @@ const useKaykatJDUploader = () => {
                 return data
             })
     }
+
+    return {
+        progress,
+        fileUrl,
+        isLoading,
+        uploadFile: mutateAsync,
+    }
 }
 
 export default useKaykatJDUploader;
