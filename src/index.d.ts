@@ -11,3 +11,4 @@ declare const useKaykatJDUploader: () => {
 
 export default useKaykatJDUploader;
 
+export declare module "index"
