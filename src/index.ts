@@ -38,6 +38,8 @@ const useKaykatJDUploader = () => {
     }
 }
 
+export default useKaykatJDUploader;
+
 
 import {z} from "zod";
 
