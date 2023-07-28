@@ -1,13 +1,17 @@
 {
   "name": "sploader-package",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "jest",
     "build": "tsc"
   },
-  "files": ["src", "README.md", "package.json"],
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ],
   "type": "module",
   "types": "dist/index.d.ts",
   "keywords": [],
