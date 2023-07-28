@@ -3,7 +3,6 @@ import {TSploaderUploadHookRequest} from "./utils/validators";
 
 import {useEffect, useState} from "react";
 
-import {env} from "./env/config";
 import {axiosChunker} from "./utils/chunker";
 
 
@@ -21,10 +20,15 @@ const useKaykatJDUploader = () => {
         if (!(blobType instanceof Blob) || !data.blob) {
             throw new Error('Blob must be set to make the request')
         }
+
+        if (!process.env.SPLOADER_API_KEY) {
+            throw new Error('API Key must be set to make the request')
+        }
+
         axiosChunker({
             blob: data.blob,
             fileType: data.fileType,
-            apiKey: env.SPLOADER_API_KEY,
+            apiKey: process.env.SPLOADER_API_KEY,
             fileId: data.uploadId,
             callback: (progress: number) => {
                 setProgress(progress * 100)
