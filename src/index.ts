@@ -1,10 +1,12 @@
-
+import {useState} from 'react'
 
 
 
 
 const useKaykatJDUploader = () => {
-
+    const [progress, setProgress] = useState(0);
+    const [fileUrl, setFileUrl] = useState<string |null>(null );
+    const [isLoading, setIsLoading] = useState(false);
 
     const mutateAsync = async (data: TSploaderUploadHookRequest) => {
         const blobType = data.blob as any
@@ -22,7 +24,7 @@ const useKaykatJDUploader = () => {
             apiKey: process.env.SPLOADER_API_KEY,
             fileId: data.uploadId,
             callback: (progress: number) => {
-                return progress * 100
+                setProgress(progress * 100)
             }
         })
             .catch((error) => {
