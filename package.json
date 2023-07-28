@@ -13,7 +13,7 @@
     "package.json"
   ],
   "type": "commonjs",
-  "types": "dist/index.d.ts",
+  "types": "src/index.d.ts",
   "keywords": [],
   "author": "",
   "license": "ISC",
