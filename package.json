@@ -12,7 +12,7 @@
     "README.md",
     "package.json"
   ],
-  "type": "module",
+  "type": "commonjs",
   "types": "src/index.d.ts",
   "keywords": [],
   "author": "",
