@@ -5,15 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "lint": "tsdx lint"
   },
+  "module": "dist/sploader-package.esm.js",
+  "typings": "dist/index.d.ts",
   "files": [
-    "src",
-    "README.md",
-    "package.json"
+    "dist",
+    "src"
   ],
-  "type": "commonjs",
-  "types": "src/index.d.ts",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -27,6 +28,7 @@
     "zennv": "^0.1.1"
   },
   "dependencies": {
+    "tsdx": "^0.14.1",
     "D": "^1.0.0",
     "zod": "^3.21.4"
   }
