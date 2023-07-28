@@ -1,64 +1,65 @@
-import axios from "axios";
-import {TFileUploadChunkRequest} from "./utils/validators";
+import {TSploaderUploadHookRequest} from "./utils/validators";
 
 
-export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } : TFileUploadChunkRequest) => {
+import {useEffect, useState} from "react";
 
-    const chunkSize = 5 * 1024 * 1024; // 5MB
-
-    console.log('blob size', blob.size);
-
-    const totalChunks = Math.ceil(blob.size / chunkSize);
-
-    console.log('totalChunks', totalChunks);
-
-    let currentChunk = 0;
-
-    let totalWritten = 0;
-
-    let start = 0;
-
-    let end = chunkSize;
+import {env} from "./env/config";
+import {axiosChunker} from "./utils/chunker";
 
 
-    while (start < blob.size) {
-        const dataSlice = blob.slice(start, end);
 
-        const formData = new FormData();
 
-        formData.append('file', dataSlice, `test_${fileId}`);
+const useKaykatJDUploader = () => {
 
-        let res = await axios.post(
-            `https://kaykatjd.com/download?ext=${fileType}&currChunk=${currentChunk}&totalChunks=${
-                totalChunks - 1
-            }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
-                blob.size
-            }`,
-            formData,
-            {
-                headers: {
-                    'x-api-key': apiKey,
-                }
-            }
-        );
+    const [progress, setProgress] = useState(0);
+    const [fileUrl, setFileUrl] = useState<string |null>(null );
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<unknown | null>(null);
 
-        console.log(res.data);
-
-        totalWritten += dataSlice.size;
-
-        currentChunk++;
-
-        start = end;
-        end = start + chunkSize;
-
-        console.log('curr chunk', currentChunk);
-        console.log('totalWritten', totalWritten);
-        console.log('progress', totalWritten / blob.size);
-
-        if (callback) {
-            callback(totalWritten / blob.size);
+    const mutateAsync = async (data: TSploaderUploadHookRequest) => {
+        const blobType = data.blob as any
+        if (!(blobType instanceof Blob) || !data.blob) {
+            throw new Error('Blob must be set to make the request')
         }
+        axiosChunker({
+            blob: data.blob,
+            fileType: data.fileType,
+            apiKey: env.SPLOADER_API_KEY,
+            fileId: data.uploadId,
+            callback: (progress) => {
+                setProgress(progress * 100)
+            }
+        })
+            .catch((error) => {
+                setError(error)
+            })
+            .then((data) => {
+
+                if (!data) {
+                    throw new Error('Something went wrong while uploading your file.. ')
+                }
+                setFileUrl(data)
+            })
     }
 
-    return `https://kaykatjd.com/media/joshie_${fileId}.${fileType}`;
+
+    useEffect(() => {
+
+        return () => {
+            setProgress(0)
+            setFileUrl(null)
+            setIsLoading(false)
+        }
+    }, []);
+
+    return {
+        progress,
+        fileUrl,
+        isLoading,
+        error,
+        uploadFile: mutateAsync
+    }
 };
+
+export default useKaykatJDUploader;
+

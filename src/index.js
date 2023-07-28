@@ -8,42 +8,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.axiosChunker = void 0;
-const axios_1 = __importDefault(require("axios"));
-const axiosChunker = ({ blob, fileId, fileType, callback, apiKey }) => __awaiter(void 0, void 0, void 0, function* () {
-    const chunkSize = 5 * 1024 * 1024; // 5MB
-    console.log('blob size', blob.size);
-    const totalChunks = Math.ceil(blob.size / chunkSize);
-    console.log('totalChunks', totalChunks);
-    let currentChunk = 0;
-    let totalWritten = 0;
-    let start = 0;
-    let end = chunkSize;
-    while (start < blob.size) {
-        const dataSlice = blob.slice(start, end);
-        const formData = new FormData();
-        formData.append('file', dataSlice, `test_${fileId}`);
-        let res = yield axios_1.default.post(`https://kaykatjd.com/download?ext=${fileType}&currChunk=${currentChunk}&totalChunks=${totalChunks - 1}&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${blob.size}`, formData, {
-            headers: {
-                'x-api-key': apiKey,
-            }
-        });
-        console.log(res.data);
-        totalWritten += dataSlice.size;
-        currentChunk++;
-        start = end;
-        end = start + chunkSize;
-        console.log('curr chunk', currentChunk);
-        console.log('totalWritten', totalWritten);
-        console.log('progress', totalWritten / blob.size);
-        if (callback) {
-            callback(totalWritten / blob.size);
+const react_1 = require("react");
+const config_1 = require("./env/config");
+const chunker_1 = require("./utils/chunker");
+const useKaykatJDUploader = () => {
+    const [progress, setProgress] = (0, react_1.useState)(0);
+    const [fileUrl, setFileUrl] = (0, react_1.useState)(null);
+    const [isLoading, setIsLoading] = (0, react_1.useState)(false);
+    const [error, setError] = (0, react_1.useState)(null);
+    const mutateAsync = (data) => __awaiter(void 0, void 0, void 0, function* () {
+        const blobType = data.blob;
+        if (!(blobType instanceof Blob) || !data.blob) {
+            throw new Error('Blob must be set to make the request');
         }
-    }
-    return `https://kaykatjd.com/media/joshie_${fileId}.${fileType}`;
-});
-exports.axiosChunker = axiosChunker;
+        (0, chunker_1.axiosChunker)({
+            blob: data.blob,
+            fileType: data.fileType,
+            apiKey: config_1.env.SPLOADER_API_KEY,
+            fileId: data.uploadId,
+            callback: (progress) => {
+                setProgress(progress * 100);
+            }
+        })
+            .catch((error) => {
+            setError(error);
+        })
+            .then((data) => {
+            if (!data) {
+                throw new Error('Something went wrong while uploading your file.. ');
+            }
+            setFileUrl(data);
+        });
+    });
+    (0, react_1.useEffect)(() => {
+        return () => {
+            setProgress(0);
+            setFileUrl(null);
+            setIsLoading(false);
+        };
+    }, []);
+    return {
+        progress,
+        fileUrl,
+        isLoading,
+        error,
+        uploadFile: mutateAsync
+    };
+};
+exports.default = useKaykatJDUploader;
