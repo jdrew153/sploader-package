@@ -2,8 +2,15 @@ import {useState} from 'react'
 
 
 
+export interface HookReturnType {
+    progress: number;
+    fileUrl: string | null;
+    isLoading: boolean;
+    uploadFile: (data: TSploaderUploadHookRequest) => Promise<void>;
+}
 
-const useKaykatJDUploader = () => {
+
+const useKaykatJDUploader = (): HookReturnType => {
     const [progress, setProgress] = useState(0);
     const [fileUrl, setFileUrl] = useState<string |null>(null );
     const [isLoading, setIsLoading] = useState(false);
