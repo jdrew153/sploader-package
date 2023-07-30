@@ -98,11 +98,11 @@ export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } 
     ;
 
 
-    const config: AxiosRequestConfig<FormData> = {
-        headers: {
-              'x-api-key': apiKeyHeaderValue,
-        }
-    }
+    // const config: AxiosRequestConfig<FormData> = {
+    //     headers: {
+    //           'x-api-key': apiKeyHeaderValue,
+    //     }
+    // }
 
     while (start < blob.size) {
         const dataSlice = blob.slice(start, end);
