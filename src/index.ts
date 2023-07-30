@@ -6,8 +6,6 @@ type UploadFileFn = {
     uploadFile: (data: TSploaderUploadHookRequest, onProgress?: ProgressCallback) => Promise<string>
 }
 
-
-
 const useKaykatJDUploader = (): UploadFileFn => {
 
 
