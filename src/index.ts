@@ -73,9 +73,6 @@ export const SploaderUploadHookRequest = z.object({
 export type TSploaderUploadHookRequest = z.infer<typeof SploaderUploadHookRequest>;
 
 
-
-import axios, {AxiosRequestConfig} from "axios";
-
 export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } : TFileUploadChunkRequest) => {
 
     const chunkSize = 5 * 1024 * 1024; // 5MB
@@ -94,10 +91,6 @@ export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } 
 
     let end = chunkSize;
 
-    // const headers: AxiosRequestConfig<FormData>['headers'] = {
-    //     'x-api-key': apiKey,
-    // };
-
     while (start < blob.size) {
         const dataSlice = blob.slice(start, end);
 
@@ -105,16 +98,21 @@ export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } 
 
         formData.append('file', dataSlice, `test_${fileId}`);
 
-        let res = await axios.post(
+        let res = await fetch(
             `https://kaykatjd.com/download?ext=${fileType}&currChunk=${currentChunk}&totalChunks=${
                 totalChunks - 1
             }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
                 blob.size
             }`,
-            formData,
+            {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'x-api-key': apiKey,
+                }
+            }
         );
-
-        console.log(res.data);
+        console.log(await res.json());
 
         totalWritten += dataSlice.size;
 
