@@ -119,7 +119,6 @@ export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } 
                 blob.size
             }`,
             formData,
-            config
         );
 
         console.log(res.data);
