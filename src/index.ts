@@ -1,19 +1,25 @@
 
-
-
-type ProgressCallback = (progress: number) => number;
 type UploadFileFn = {
-    uploadFile: (data: TSploaderUploadHookRequest, onProgress?: ProgressCallback) => Promise<string>
+    uploadFile: (data: TSploaderUploadHookRequest, onProgress?: TCallbackFunction) => Promise<string>
 }
+
+type TSploaderCallbackFunction = (progress: number) => void;
 
 const useKaykatJDUploader = (): UploadFileFn => {
 
+    if (!process.env.SPLOADER_API_KEY) {
+        throw new Error("SPLOADER_API_KEY is required");
+    }
 
-   const uploadFile = async (data: TSploaderUploadHookRequest, onProgress?: (progress: number) => number) => {
+   const uploadFile = async (data: TSploaderUploadHookRequest, onProgress?: TCallbackFunction) => {
+
 
        const updateProgress = (progress: number) => {
+
            if (onProgress) {
                onProgress(progress);
+           } else {
+               console.warn("No progress is available to be provided")
            }
        }
 
@@ -26,21 +32,36 @@ const useKaykatJDUploader = (): UploadFileFn => {
            fileId: data.uploadId,
            fileType: data.fileType,
            callback: callback,
-           apiKey: process.env.SPLOADER_API_KEY || ''
+           apiKey: process.env.SPLOADER_API_KEY!
        }) as string;
    }
 
     return {
        uploadFile
     }
-
 };
+
+
+interface TSploaderCallbackFunctionModel {
+    onProgress?: TSploaderCallbackFunction
+}
+
+// Custom parser for callback function of type TCallbackFunction
+function callbackFunctionParser(onProgress: unknown) : TSploaderCallbackFunction | unknown {
+    if (typeof onProgress === "function") {
+        return onProgress as TSploaderCallbackFunction;
+    } else {
+        throw new Error("onProgress must be a function");
+    }
+}
 
 export default useKaykatJDUploader;
 
-
 import {z} from "zod";
 
+const CallbackFunction = z.function().args(z.number()).returns(z.number()).optional();
+
+export type TCallbackFunction = z.infer<typeof CallbackFunction>;
 
 export const FileUploadChunkRequest = z.object({
     blob: z.any(),
@@ -74,7 +95,7 @@ export type TSploaderUploadHookRequest = z.infer<typeof SploaderUploadHookReques
 
 
 
-import axios, {AxiosRequestConfig} from "axios";
+import axios from "axios";
 
 export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } : TFileUploadChunkRequest) => {
 
@@ -94,15 +115,7 @@ export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } 
 
     let end = chunkSize;
 
-    const apiKeyHeaderValue = apiKey as string
-    ;
-
-
-    // const config: AxiosRequestConfig<FormData> = {
-    //     headers: {
-    //           'x-api-key': apiKeyHeaderValue,
-    //     }
-    // }
+    const apiKeyHeaderValue = apiKey as string;
 
     while (start < blob.size) {
         const dataSlice = blob.slice(start, end);
@@ -110,16 +123,13 @@ export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } 
         const formData = new FormData();
 
         formData.append('file', dataSlice, `test_${fileId}`);
+        formData.append('apiKey', apiKeyHeaderValue);
 
-        //@ts-ignore
-        let res = await axios.post(
-            `https://kaykatjd.com/download?ext=${fileType}&currChunk=${currentChunk}&totalChunks=${
-                totalChunks - 1
-            }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
-                blob.size
-            }`,
-            formData,
-        );
+        let res = await axios.post( `https://kaykatjd.com/download?ext=${fileType}&currChunk=${currentChunk}&totalChunks=${
+                    totalChunks - 1
+                }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
+                    blob.size
+                }`, formData)
 
         console.log(res.data);
 
@@ -141,5 +151,8 @@ export const axiosChunker = async ({ blob, fileId, fileType, callback, apiKey } 
 
     return `https://kaykatjd.com/media/joshie_${fileId}.${fileType}`;
 };
+
+
+
 
 
