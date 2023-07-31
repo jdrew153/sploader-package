@@ -8,7 +8,7 @@ type TSploaderCallbackFunction = (progress: number) => void;
 const useKaykatJDUploader = (): UploadFileFn => {
 
     if (!process.env.SPLOADER_API_KEY) {
-        throw new Error("SPLOADER_API_KEY is required");
+       console.warn("SPLOADER_API_KEY is required");
     }
 
    const uploadFile = async (data: TSploaderUploadHookRequest, onProgress?: TCallbackFunction) => {
