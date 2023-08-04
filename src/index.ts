@@ -34,7 +34,7 @@ export default class Sploader {
                     fileType: validData.fileType,
                     callback: callback,
                     apiKey: this.apiKey!
-                }) as string;
+                }) as unknown as string;
             }
 
             return {
