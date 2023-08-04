@@ -1,8 +1,8 @@
 import axios, {AxiosError} from "axios";
 import {TFileUploadChunkRequest} from "../validators";
-import {HandleResizeImage} from "./resizing";
+import {FileUrlAndSize, HandleResizeImage} from "./resizing";
 
-export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: TFileUploadChunkRequest): Promise<string[] | undefined> => {
+export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: TFileUploadChunkRequest): Promise<FileUrlAndSize[] | undefined> => {
 
     if (fileType.includes("/")) {
         fileType = fileType.split("/")[1];
