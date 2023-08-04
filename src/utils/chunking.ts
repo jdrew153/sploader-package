@@ -34,7 +34,7 @@ export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: T
         formData.append('file', dataSlice, `test_${fileId}`);
         formData.append('apiKey', apiKeyHeaderValue);
 
-        try {
+
             let res = await axios.post(`https://kaykatjd.com/download?ext=${fileType}&currChunk=${currentChunk}&totalChunks=${
                 totalChunks - 1
             }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
@@ -57,14 +57,6 @@ export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: T
             if (callback) {
                 callback(totalWritten / blob.size);
             }
-        } catch (e) {
-           if (e instanceof AxiosError) {
-               throw new Error(e.message);
-           } else {
-               console.log(e)
-               throw new Error("Something went wrong...");
-           }
-        }
     }
 
     const resizedImageUrls = await HandleResizeImage(`joshie_${fileId}.${fileType}`);

@@ -9,8 +9,8 @@ export default class Sploader {
         this.apiKey = process.env.SPLOADER_API_KEY;
     }
 
-    useKaykatJDUploader = (): UploadFileFn | undefined => {
-        try {
+    useKaykatJDUploader = (): UploadFileFn  => {
+
             const uploadFile = async (data: TSploaderUploadHookRequest, onProgress?: TCallbackFunction) => {
 
                 const validData = SploaderUploadHookRequest.parse(data);
@@ -40,14 +40,6 @@ export default class Sploader {
             return {
                 uploadFile
             }
-        } catch (e) {
-            if (e instanceof ZodError) {
-                throw new Error(e.message);
-            } else {
-                console.log(e)
-                throw new Error("Something went wrong...");
-            }
-        }
     }
 }
 
