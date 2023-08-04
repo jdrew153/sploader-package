@@ -1,0 +1,80 @@
+import axios, {AxiosError} from "axios";
+import {TFileUploadChunkRequest} from "../validators";
+import {HandleResizeImage} from "./resizing";
+
+export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: TFileUploadChunkRequest): Promise<string[] | undefined> => {
+
+    if (fileType.includes("/")) {
+        fileType = fileType.split("/")[1];
+    }
+
+    const chunkSize = 5 * 1024 * 1024; // 5MB
+
+    console.log('blob size', blob.size);
+
+    const totalChunks = Math.ceil(blob.size / chunkSize);
+
+    console.log('totalChunks', totalChunks);
+
+    let currentChunk = 0;
+
+    let totalWritten = 0;
+
+    let start = 0;
+
+    let end = chunkSize;
+
+    const apiKeyHeaderValue = apiKey as string;
+
+    while (start < blob.size) {
+        const dataSlice = blob.slice(start, end);
+
+        const formData = new FormData();
+
+        formData.append('file', dataSlice, `test_${fileId}`);
+        formData.append('apiKey', apiKeyHeaderValue);
+
+        try {
+            let res = await axios.post(`https://kaykatjd.com/download?ext=${fileType}&currChunk=${currentChunk}&totalChunks=${
+                totalChunks - 1
+            }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
+                blob.size
+            }`, formData)
+
+            console.log(res.data);
+
+            totalWritten += dataSlice.size;
+
+            currentChunk++;
+
+            start = end;
+            end = start + chunkSize;
+
+            console.log('curr chunk', currentChunk);
+            console.log('totalWritten', totalWritten);
+            console.log('progress', totalWritten / blob.size);
+
+            if (callback) {
+                callback(totalWritten / blob.size);
+            }
+        } catch (e) {
+           if (e instanceof AxiosError) {
+               throw new Error(e.message);
+           } else {
+               console.log(e)
+               throw new Error("Something went wrong...");
+           }
+        }
+    }
+
+    const resizedImageUrls = await HandleResizeImage(`joshie_${fileId}.${fileType}`);
+
+   if (resizedImageUrls) {
+       return resizedImageUrls;
+   }
+};
+
+
+
+
+
