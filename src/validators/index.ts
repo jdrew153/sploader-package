@@ -1,4 +1,5 @@
 import {z} from "zod";
+import {FileUrlAndSize} from "../utils/resizing";
 
 const CallbackFunction = z.function().args(z.number()).returns(z.number()).optional();
 
@@ -36,6 +37,6 @@ export type TSploaderUploadHookRequest = z.infer<typeof SploaderUploadHookReques
 
 
 export type UploadFileFn = {
-    uploadFile: (data: TSploaderUploadHookRequest, onProgress?: TCallbackFunction) => Promise<string>
+    uploadFile: (data: TSploaderUploadHookRequest, onProgress?: TCallbackFunction) => Promise<FileUrlAndSize[]>
 }
 

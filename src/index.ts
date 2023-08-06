@@ -1,12 +1,13 @@
 import {SploaderUploadHookRequest, TCallbackFunction, TSploaderUploadHookRequest, UploadFileFn} from "./validators";
 import {axiosChunker} from "./utils/chunking";
 import {ZodError} from "zod";
+import {FileUrlAndSize} from "./utils/resizing";
 
 
 export default class Sploader {
     apiKey: string | undefined;
-    constructor() {
-        this.apiKey = process.env.SPLOADER_API_KEY;
+    constructor(apiKey: string) {
+        this.apiKey = apiKey
     }
 
     useKaykatJDUploader = (): UploadFileFn  => {
@@ -34,7 +35,7 @@ export default class Sploader {
                     fileType: validData.fileType,
                     callback: callback,
                     apiKey: this.apiKey!
-                }) as unknown as string;
+                }) as unknown as FileUrlAndSize[];
             }
 
             return {
