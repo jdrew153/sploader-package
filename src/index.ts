@@ -1,8 +1,12 @@
 import {SploaderUploadHookRequest, TCallbackFunction, TSploaderUploadHookRequest, UploadFileFn} from "./validators";
 import {axiosChunker} from "./utils/chunking";
-import {ZodError} from "zod";
 import {FileUrlAndSize} from "./utils/resizing";
 
+
+///
+///  TODO: Add logic to add the url to the application of the user with the provided api key...
+///  This is important because use of the package outside of sploader.dev needs to be able to add the data to the sploader main DB.
+///
 
 export default class Sploader {
     apiKey: string | undefined;

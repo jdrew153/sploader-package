@@ -6,6 +6,7 @@ export async function HandleResizeImage(filePath: string): Promise<FileUrlAndSiz
             filePath: filePath
         });
         return res.data as FileUrlAndSize[];
+
     } catch (e) {
         if (e instanceof AxiosError) {
            throw new Error(e.message);

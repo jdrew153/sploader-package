@@ -2,7 +2,7 @@ import axios, {AxiosError} from "axios";
 import {TFileUploadChunkRequest} from "../validators";
 import {FileUrlAndSize, HandleResizeImage} from "./resizing";
 
-export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: TFileUploadChunkRequest): Promise<FileUrlAndSize[] | undefined> => {
+export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: TFileUploadChunkRequest): Promise<FileUrlAndSize[] | string | undefined> => {
 
     if (fileType.includes("/")) {
         fileType = fileType.split("/")[1];
@@ -39,7 +39,7 @@ export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: T
                 totalChunks - 1
             }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
                 blob.size
-            }`, formData)
+            }&remote="true"`, formData)
 
             console.log(res.data);
 
@@ -57,6 +57,11 @@ export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: T
             if (callback) {
                 callback(totalWritten / blob.size);
             }
+    }
+
+
+    if (fileType.includes(".mp4")) {
+        return `https://kaykatjd.com/media/joshie_${fileId}.${fileType}`
     }
 
     const resizedImageUrls = await HandleResizeImage(`joshie_${fileId}.${fileType}`);
