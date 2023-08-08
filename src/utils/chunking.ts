@@ -39,7 +39,7 @@ export const axiosChunker = async ({blob, fileId, fileType, callback, apiKey}: T
                 totalChunks - 1
             }&fileName=${'joshie' + '_' + fileId}&fileId=${fileId}&totalSize=${
                 blob.size
-            }&remote="true"`, formData)
+            }&remote=true`, formData)
 
             console.log(res.data);
 
